@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "HW1 R Notebook"
 output:
   html_document:
     df_print: paged
@@ -45,50 +45,49 @@ tail(x = fragility23, 10)             # Show the last 10 rows of the data frame
 ## Transformative manipulation
 
 ```{r}
-grep(pattern = "Country|S1|P1|E2|Total",
+grep(pattern = "Country|S1|P1|E2|Total", # return the column names matching any of these patterns (regex OR with |)
      x = names(fragility23),
      fixed = FALSE,
      value = TRUE)
-                                      # Test: return the column names matching any of these patterns (regex OR with |)
+                                      
 
-keep <- grep("Country|S1|P1|E2|Total",
+keep <- grep("Country|S1|P1|E2|Total",  # Save the matching column names into `keep`
              names(fragility23),
              value = TRUE)
-                                      # Save the matching column names into `keep`
+                                      
 
-frag23_sub <- fragility23[, keep]
-                                      # Subset the data frame to keep only those selected columns; store as `frag23_sub`
+frag23_sub <- fragility23[, keep]  # Subset the data frame to keep only those selected columns; store as `frag23_sub`
+                                      
 
-names(frag23_sub)[3:5] <- c("S1", "E2", "P1")
-                                      # Rename columns 3–5 (whatever they currently are) to S1, E2, and P1
+names(frag23_sub)[3:5] <- c("S1", "E2", "P1") # Rename columns 3–5 (whatever they currently are) to S1, E2, and P1
+                                      
 
-tail(frag23_sub[order(x = -frag23_sub$E2), ], 10)
-                                      # Order rows by E2 descending and show the last 10 rows (note: this is NOT top 10)
+tail(frag23_sub[order(x = -frag23_sub$E2), ], 10)  # Order rows by E2 descending and show the last 10 rows (note: this is NOT top 10)
+                                     
 
-tail(frag23_sub[order(x = -frag23_sub$E2), "Country"], 10)
-                                      # Same ordering, but show only the Country column for the last 10 rows
-
-summary(object = frag23_sub)          # Produce summary stats (min/median/mean/quartiles) for each column
+tail(frag23_sub[order(x = -frag23_sub$E2), "Country"], 10)  # Same ordering, but show only the Country column for the last 10 rows
+                                     
 
 summary(object = frag23_sub)          # Produce summary stats (min/median/mean/quartiles) for each column
 
-q3_Total <- quantile(x = frag23_sub$Total,
+
+q3_Total <- quantile(x = frag23_sub$Total, # Compute the 75th percentile (Q3) of Total, ignoring missing values
                      probs = 0.75,
                      na.rm = TRUE)
-                                      # Compute the 75th percentile (Q3) of Total, ignoring missing values
+                                      
 
 cor(x = frag23_sub[, -c(1, 2)])       # Correlation matrix of numeric columns excluding Country (col 1) and Total (col 2)
 
-# install.packages("corrtable")       # (Run once) Install corrtable if needed
+# install.packages("corrtable")       
 library(corrtable)                    # Load corrtable for correlation matrices with significance tests
 
-corrtable::correlation_matrix(df = frag23_sub[, -c(1, 2)])
-                                      # Compute correlation matrix + p-values/significance for S1/E2/P1 (excluding Country/Total)
+corrtable::correlation_matrix(df = frag23_sub[, -c(1, 2)]) # Compute correlation matrix + p-values/significance for S1/E2/P1 (excluding Country/Total)
+                                      
 
 lm(S1 ~ P1 + E2, data = frag23_sub)   # Fit a linear model predicting S1 from P1 and E2 (prints a compact model object)
 
-model <- lm(S1 ~ P1 + E2, data = frag23_sub)
-                                      # Fit the same model but store it in `model` for reuse
+model <- lm(S1 ~ P1 + E2, data = frag23_sub) # Fit the same model but store it in `model` for reuse
+                                      
 
 summary(model)                        # Show full regression output: coefficients, standard errors, t-tests, R^2, etc.
 
@@ -99,36 +98,34 @@ summary(model)                        # Show full regression output: coefficient
 ```{r}
 hist(x = frag23_sub$P1)               # Histogram of the P1 variable (base R)
 
-plot(x = frag23_sub$S1, y = frag23_sub$E2)
-                                      # Scatterplot of S1 (x-axis) vs E2 (y-axis)
+plot(x = frag23_sub$S1, y = frag23_sub$E2) # Scatterplot of S1 (x-axis) vs E2 (y-axis)
+                                      
 
 frag23_sub$Total >= q3_Total          # Logical check (TRUE/FALSE) for each row: is Total in the worst (top) quartile?
 
-frag23_sub$worstQt <- frag23_sub$Total >= q3_Total
-                                      # Create a new logical column `worstQt` marking countries in the top quartile of Total
+frag23_sub$worstQt <- frag23_sub$Total >= q3_Total  # Create a new logical column `worstQt` marking countries in the top quartile of Total
+                                     
 
-plot(frag23_sub$S1,
+plot(frag23_sub$S1,  
      frag23_sub$E2,
      pch = 20,
-     col = as.factor(frag23_sub$worstQt))
-                                      # Scatterplot with solid points; color points by worstQt group (TRUE vs FALSE)
+     col = as.factor(frag23_sub$worstQt))  # Scatterplot with solid points; color points by worstQt group (TRUE vs FALSE)
+                                     
 ```
 
 ## Visual of the regression P1 and E2 on S1
 
 ```{r}
-# install.packages("sjPlot")          # (Run once) Install sjPlot if needed
+# install.packages("sjPlot")        
 library(sjPlot)                       # Load sjPlot for quick regression visualization
 
 plot_models(model)                    # Plot the regression model estimates (e.g., coefficients with confidence intervals)
 ```
 ```{r}
-
 # Boxplot of Total fragility score
-# This shows the distribution and outliers of Total values
 boxplot(frag23_sub$Total,
         main = "Distribution of Total Fragility Scores",
-        ylab = "Total Score")
+        ylab = "Total Score") # This shows the distribution and outliers of Total values
 ```
 
 
